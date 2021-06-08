@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" href="assets/favicon.png" type="image/png">
+    <title>Jogo em Vuejs</title>
+</head>
+<body>
+    <div id="app">
+        <div class="container text-center">
+            <h2 class="title">Blacjack</h2>
+            <div class="row">
+
+                <div :class="['col-6', playerSelected == 1  ? 'active' : '']">
+                    <img src="assets/player1.png" alt="Jogador 1">
+                    <p>
+                        Jogador 1
+                        <span class="badge badge-default">{{numberHistoricPlayerOne}}</span>
+                    </p>
+                    <p><strong>Pontos:</strong> {{playerOne.points}}</p>
+                </div>
+                <div :class="['col-6', playerSelected == 2  ? 'active' : '']">
+                    <img src="assets/player2.png" alt="Jogador 2">
+                    <p>
+                        Jogador 2
+                        <span class="badge badge-default">{{numberHistoricPlayerTwo}}</span>
+                    </p>
+                    <p><strong>Pontos:</strong> {{playerTwo.points}}</p>
+                </div>
+
+                <div class="controls col">
+                    <a href="#" class="btn btn-success" @click.prevent="passar">Passar</a>
+                    <a href="#" class="btn btn-primary" @click.prevent="finalizar">Finalizar</a>
+                    <a href="#" class="btn btn-danger" @click.prevent="reset">Reset</a>
+                </div>
+
+            </div>            
+        
+            <hr>
+            <div class="row">
+                <div class="col-6">
+                    <a href="#" @click.prevent="randomCard">
+                        <img src="assets/baralho-cartas.png" alt="Baralho" class="carts">
+                    </a>
+                </div>
+                <div class="col-6">
+                    <div v-if="cartSelected != ''">
+                        <img :src="'assets/carts/'+cartSelected+'.png'" alt="Ás" class="cart">
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>
+    <script src="vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+
+            data: {
+                playerSelected: 1,
+                playerOne:{
+                    points:0,
+                    historic: [],
+                },
+                playerTwo:{
+                    points:0,
+                    historic: [],
+                },
+                cartSelected: '',
+            },
+
+            methods: {
+
+                passar(){   
+
+                  if(this.playerSelected == 1){
+                    this.playerSelected = 2;
+                  }else{
+                    this.playerSelected = 1;
+                  }
+                  
+                  this.cartSelected = '';
+
+                },
+
+                randomCard(){
+
+                    let card = Math.floor((Math.random() * 13) + 1);
+                    this.cartSelected = card;
+                    
+                    if(this.playerSelected == 1){
+                        this.playerOne.points += card; 
+                        this.playerOne.historic.push(card);                                               
+                    }else{
+                        this.playerTwo.points += card;
+                        this.playerTwo.historic.push(card);
+                    }
+
+                    if(this.playerOne.points > 21 || this.playerTwo.points > 21){
+                        this.finalizar();
+                    }
+
+                    
+
+                },
+
+                finalizar(){
+                    if(this.playerOne.points <= 21 && this.playerOne.points > this.playerTwo.points){
+                        alert("Jogador 1 ganhou com " + this.playerOne.points + " Pontos");
+                    }
+
+                    else if(this.playerTwo.points <= 21 && this.playerTwo.points > this.playerOne.points){
+                        alert("Jogador 2 ganhou com " + this.playerTwo.points + " Pontos");
+                    }
+
+                    else if(this.playerOne.points > 21){
+                        alert("Jogador 2 ganhou com " + this.playerTwo.points + " Pontos");
+                    }
+
+                    else if(this.playerTwo.points > 21){
+                        alert("Jogador 1 ganhou com " + this.playerOne.points + " Pontos");
+                    }
+
+                    else{
+                        alert("Empate!");
+                    }
+
+                    let vm = this;
+                    setTimeout(function(){
+                        vm.reset();
+                    }, 3000);
+                },
+
+                reset(){
+                    this.playerSelected = 1;
+                    this.cartSelected = '';
+                    this.playerOne.points = 0;
+                    this.playerTwo.points = 0;
+                }
+
+
+            },
+
+            computed: {
+                numberHistoricPlayerOne(){
+                    return this.playerOne.historic.length;
+                },
+                numberHistoricPlayerTwo(){
+                    return this.playerTwo.historic.length;
+                }
+            }
+
+        });
+    </script>
+</body>
+</html>
